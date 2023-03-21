@@ -1,9 +1,15 @@
 import React from "react";
 
-function Locations({ props }) {
+function Locations({ locationsNames, showInfos }) {
   return (
     <div>
-      <h2 className="locations">{props}</h2>
+      {locationsNames.map((location) => (
+        <div key={location.name}>
+          <h2 className="locationNames" onClick={() => showInfos(location)}>
+            {location.name}
+          </h2>
+        </div>
+      ))}
     </div>
   );
 }
