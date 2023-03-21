@@ -2,6 +2,7 @@ import "./App.css";
 import React, { useState, useEffect } from "react";
 import Locations from "./components/Locations";
 import PokeData from "./components/PokeData";
+import MyPokemons from "./components/MyPokemons";
 
 function App() {
   //Show Locations
@@ -17,11 +18,14 @@ function App() {
   const [selectedLocationSecondLink, setSelectedLocationSecondLink] =
     useState(null);
   //Pokemon Name
-  const [randomPokemonName, setRandomPokemonName] = useState(null);
+  const [randomPokemonName, setRandomPokemonName] = useState(".");
   //Pokemon Image
   const [randomPokemonImageFirstLink, setRandomPokemonImageFirstLink] =
     useState(null);
   const [randomPokemonImage, setRandomPokemonImage] = useState(null);
+  //My Pokemon Informations: Name and Photo
+  // const [ownedPokemonNames, setOwnedPokemonNames] = useState(null);
+  const [ownedPokemonData, setOwnedPokemonData] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -41,7 +45,7 @@ function App() {
     setSelectedLocation(null);
     setSelectedLocationFirstLink(null);
     setSelectedLocationSecondLink(null);
-    setRandomPokemonName(null);
+    setRandomPokemonName(".");
     setRandomPokemonImage(null);
   };
 
@@ -54,6 +58,7 @@ function App() {
     const linkLocation = location.url;
     setSelectedLocationFirstLink(linkLocation);
   }
+
   //Accesing the first URL
   useEffect(() => {
     async function fetchData() {
@@ -111,18 +116,58 @@ function App() {
     fetchData();
   }, [randomPokemonImageFirstLink]);
 
+  //My own Pokemons
+  const usersPokemon = [
+    "https://pokeapi.co/api/v2/pokemon/bulbasaur",
+    "https://pokeapi.co/api/v2/pokemon/charizard",
+    "https://pokeapi.co/api/v2/pokemon/poliwhirl",
+  ];
+
+  const myPokemonInfos = [];
+
+  useEffect(() => {
+    // const myPokemonInfos = [];
+    const getPokeInfo = async () => {
+      for (const pokeApi of usersPokemon) {
+        const info = await fetch(pokeApi);
+        const data = await info.json();
+        myPokemonInfos.push({
+          name: data.forms[0].name,
+          photo: data.sprites.front_default,
+        });
+        console.log(myPokemonInfos);
+      }
+      setOwnedPokemonData(myPokemonInfos);
+      // console.log(myPokemonInfos)
+    };
+    getPokeInfo();
+  }, []);
+  console.log(myPokemonInfos);
+
+  //Saving My Pokemon Names
+  // const myPokemonsNames = () => {
+  //   const names = usersPokemon.map(name => name.split('/').slice(-1).join(','))
+  //   setOwnedPokemonNames(names)
+  // }
+
   return (
     <div className="App">
       {onPage ? (
-        <PokeData
-          name={
-            randomPokemonName
-              ? randomPokemonName
-              : "This location doesn't seem to have any pokémon"
-          }
-          photo={randomPokemonImage}
-          onBack={handleBack}
-        />
+        <div>
+          {ownedPokemonData.map((pokemon) => (
+            <MyPokemons name={pokemon.name} photo={pokemon.photo}/>
+          ))}
+
+          <PokeData
+            name={
+              randomPokemonName
+                ? randomPokemonName
+                : "This location doesn't seem to have any pokémon"
+            }
+            photo={randomPokemonImage}
+            onBack={handleBack}
+          />
+        </div>
       ) : (
         <Locations
           locationsNames={locations}
