@@ -35,7 +35,7 @@ function App() {
   const [ownedPokemonData, setOwnedPokemonData] = useState(null);
   //Chosen Pokemon
   const [chosenPokemon, setChosenPokemon] = useState(null);
-
+  // const [chosenOrNot, setChosenOrNot] = useState(null);
   const [statsChosenPokemon, setStatsChosenPokemon] = useState(null);
 
   useEffect(() => {
@@ -59,6 +59,7 @@ function App() {
     setRandomPokemonName(".");
     setRandomPokemonImage(null);
     setChosenPokemon(null);
+    setStatsChosenPokemon(null);
   };
 
   //Showing Pokemon Details
@@ -98,9 +99,7 @@ function App() {
         setRandomPokemonName(
           secondLink.pokemon_encounters[randomName].pokemon.name
         );
-        setMainLink(
-          secondLink.pokemon_encounters[randomName].pokemon.url
-        );
+        setMainLink(secondLink.pokemon_encounters[randomName].pokemon.url);
       } catch (error) {
         console.error(error);
       }
@@ -121,13 +120,6 @@ function App() {
           defense: mainLinkPokemon.stats[2].base_stat,
         };
         setEncounteredPokemonStats(stats);
-        // setRandomPokemonImage(
-        //   mainLinkPokemon.sprites.other.dream_world.front_default
-        // );
-        // setHpEncountered(mainLinkPokemon.stats[0].base_stat);
-        // setAttackEncountered(mainLinkPokemon.stats[1].base_stat)
-        // setDefenseEncountered(mainLinkPokemon.stats[2].base_stat)
-        
       } catch (error) {
         console.error(error);
       }
@@ -151,7 +143,11 @@ function App() {
         const data = await info.json();
         myPokemonInfos.push({
           name: data.forms[0].name,
-          photo: data.sprites.front_default,
+          photoSmall: data.sprites.front_default,
+          photoBig: data.sprites.other.dream_world.front_default,
+          hp: data.stats[0].base_stat,
+          attack: data.stats[1].base_stat,
+          defense: data.stats[2].base_stat,
         });
       }
       setOwnedPokemonData(myPokemonInfos);
@@ -161,33 +157,11 @@ function App() {
 
   //Choosing my Pokemon
   const choosingMyPokemon = (event) => {
-    console.log(event.target.value);
-    setChosenPokemon("https://pokeapi.co/api/v2/pokemon/" + event.target.value);
+    setStatsChosenPokemon(
+      ownedPokemonData.filter((pokemon) => pokemon.name === event.target.value)
+    );
   };
 
-  //Showing My Chosen Pokemon Stats
-
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const info = await fetch(chosenPokemon);
-  //       const data = await info.json();
-  //       const stats ={
-  //         name: data.forms[0].name,
-  //         photo: data.sprites.other.dream_world.front_default,
-  //         hp: data.stats[0].base_stat,
-  //         attack: data.stats[1].base_stat,
-  //         defense: data.stats[2].base_stat,
-  //       };
-  //       setStatsChosenPokemon(stats)
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-  //   fetchData();
-  // }, []);
-  // console.log(statsChosenPokemon)
-  console.log(encounteredPokemonStats)
   return (
     <div className="App">
       {onPage ? (
@@ -195,23 +169,38 @@ function App() {
           {ownedPokemonData.map((pokemon) => (
             <MyPokemons
               name={pokemon.name}
-              photo={pokemon.photo}
+              photo={pokemon.photoSmall}
               onUse={choosingMyPokemon}
             />
           ))}
 
-          {encounteredPokemonStats && <PokeData
-            name={
-              randomPokemonName
-                ? randomPokemonName
-                : "This location doesn't seem to have any pokémon"
-            }
-            photo={encounteredPokemonStats.photo}
-            hp= {encounteredPokemonStats.hp}
-            attack = {encounteredPokemonStats.attack}
-            defense = {encounteredPokemonStats.defense}
-            onBack={handleBack}
-          />}
+          {encounteredPokemonStats && (
+            <PokeData
+              name={
+                randomPokemonName
+                  ? randomPokemonName
+                  : "This location doesn't seem to have any pokémon"
+              }
+              photo={encounteredPokemonStats.photo}
+              hp={encounteredPokemonStats.hp}
+              attack={encounteredPokemonStats.attack}
+              defense={encounteredPokemonStats.defense}
+              // onBack={handleBack}
+            />
+          )}
+
+          {statsChosenPokemon && (
+            <MyPokemonStats
+              name={
+                statsChosenPokemon[0].name.charAt(0).toUpperCase() +
+                statsChosenPokemon[0].name.slice(1)
+              }
+              photo={statsChosenPokemon[0].photoBig}
+              hp={statsChosenPokemon[0].hp}
+              attack={statsChosenPokemon[0].attack}
+              defense={statsChosenPokemon[0].defense}
+            />
+          )}
         </div>
       ) : (
         <Locations
