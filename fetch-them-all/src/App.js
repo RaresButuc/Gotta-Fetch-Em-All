@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Locations from "./components/Locations";
 import PokeData from "./components/PokeData";
 import MyPokemons from "./components/MyPokemons";
+import MyPokemonStats from "./components/MyPokemonStats";
 
 function App() {
   //Show Locations
@@ -17,16 +18,25 @@ function App() {
   //Selected Location SLink
   const [selectedLocationSecondLink, setSelectedLocationSecondLink] =
     useState(null);
-  //Pokemon Name
+  //Encountered Pokemon Name
   const [randomPokemonName, setRandomPokemonName] = useState(".");
-  //Pokemon Image
-  const [randomPokemonImageFirstLink, setRandomPokemonImageFirstLink] =
-    useState(null);
+  //Accesing Main Link
+  const [mainLink, setMainLink] = useState(null);
+  //Encountered Pokemon Image
   const [randomPokemonImage, setRandomPokemonImage] = useState(null);
+  //Encountered Pokemon Stats
+  const [hpEncountered, setHpEncountered] = useState(null);
+  const [attackEncountered, setAttackEncountered] = useState(null);
+  const [defenseEncountered, setDefenseEncountered] = useState(null);
+
+  // const [encounteredPokemonStats, setEncounteredPokemonStats] = useState(null);
+
   //My Pokemon Informations: Name and Photo
   const [ownedPokemonData, setOwnedPokemonData] = useState(null);
   //Chosen Pokemon
   const [chosenPokemon, setChosenPokemon] = useState(null);
+
+  const [statsChosenPokemon, setStatsChosenPokemon] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -48,7 +58,7 @@ function App() {
     setSelectedLocationSecondLink(null);
     setRandomPokemonName(".");
     setRandomPokemonImage(null);
-    setChosenPokemon(null)
+    setChosenPokemon(null);
   };
 
   //Showing Pokemon Details
@@ -68,9 +78,7 @@ function App() {
         const info = await fetch(selectedLocationFirstLink);
         const firstLink = await info.json();
         let randomArea = Math.floor(Math.random() * firstLink.areas.length);
-        // console.log(randomArea);
         setSelectedLocationSecondLink(firstLink.areas[randomArea].url);
-        // console.log(firstLink);
       } catch (error) {
         console.error(error);
       }
@@ -87,11 +95,10 @@ function App() {
         let randomName = Math.floor(
           Math.random() * secondLink.pokemon_encounters.length
         );
-        // console.log(secondLink);
         setRandomPokemonName(
           secondLink.pokemon_encounters[randomName].pokemon.name
         );
-        setRandomPokemonImageFirstLink(
+        setMainLink(
           secondLink.pokemon_encounters[randomName].pokemon.url
         );
       } catch (error) {
@@ -101,23 +108,31 @@ function App() {
     fetchData();
   }, [selectedLocationSecondLink]);
 
-  //Accesing the second URL for Image
+  //Encountered Pokemon Stats
   useEffect(() => {
     async function fetchData() {
       try {
-        const info = await fetch(randomPokemonImageFirstLink);
-        const imageLink = await info.json();
+        const info = await fetch(mainLink);
+        const mainLinkPokemon = await info.json();
+        // const stats = {
+        //   hp: mainLinkPokemon.stats[0].base_stat,
+        //   attack: mainLinkPokemon.stats[1].base_stat,
+        //   defense: mainLinkPokemon.stats[2].base_stat,
+        // };
+        // setEncounteredPokemonStats(stats);
         setRandomPokemonImage(
-          imageLink.sprites.other.dream_world.front_default
-          // imageLink.sprites.front_default
+          mainLinkPokemon.sprites.other.dream_world.front_default
         );
-        // console.log(secondLink);
+        setHpEncountered(mainLinkPokemon.stats[0].base_stat);
+        setAttackEncountered(mainLinkPokemon.stats[1].base_stat)
+        setDefenseEncountered(mainLinkPokemon.stats[2].base_stat)
+        
       } catch (error) {
         console.error(error);
       }
     }
     fetchData();
-  }, [randomPokemonImageFirstLink]);
+  }, [mainLink]);
 
   //My own Pokemons
   const usersPokemon = [
@@ -126,8 +141,8 @@ function App() {
     "https://pokeapi.co/api/v2/pokemon/poliwhirl",
   ];
 
+  //Getting the names and photos of my pokemons
   useEffect(() => {
-    // const myPokemonInfos = [];
     const getPokeInfo = async () => {
       const myPokemonInfos = [];
       for (const pokeApi of usersPokemon) {
@@ -137,27 +152,40 @@ function App() {
           name: data.forms[0].name,
           photo: data.sprites.front_default,
         });
-        // console.log(myPokemonInfos);
       }
       setOwnedPokemonData(myPokemonInfos);
-      // console.log(myPokemonInfos)
     };
     getPokeInfo();
   }, []);
-  // console.log(myPokemonInfos);
-
-  //Saving My Pokemon Names
-  // const myPokemonsNames = () => {
-  //   const names = usersPokemon.map(name => name.split('/').slice(-1).join(','))
-  //   setOwnedPokemonNames(names)
-  // }
 
   //Choosing my Pokemon
-  const choosingMyPokemon = event => {
-    console.log(event.target.value)
-    setChosenPokemon("https://pokeapi.co/api/v2/pokemon/" + event.target.value)
+  const choosingMyPokemon = (event) => {
+    console.log(event.target.value);
+    setChosenPokemon("https://pokeapi.co/api/v2/pokemon/" + event.target.value);
   };
-  console.log(chosenPokemon)
+
+  //Showing My Chosen Pokemon Stats
+
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const info = await fetch(chosenPokemon);
+  //       const data = await info.json();
+  //       const stats ={
+  //         name: data.forms[0].name,
+  //         photo: data.sprites.other.dream_world.front_default,
+  //         hp: data.stats[0].base_stat,
+  //         attack: data.stats[1].base_stat,
+  //         defense: data.stats[2].base_stat,
+  //       };
+  //       setStatsChosenPokemon(stats)
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  //   fetchData();
+  // }, []);
+  // console.log(statsChosenPokemon)
 
   return (
     <div className="App">
@@ -178,6 +206,9 @@ function App() {
                 : "This location doesn't seem to have any pokémon"
             }
             photo={randomPokemonImage}
+            hp={hpEncountered}
+            attack={attackEncountered}
+            deffense={defenseEncountered}
             onBack={handleBack}
           />
         </div>

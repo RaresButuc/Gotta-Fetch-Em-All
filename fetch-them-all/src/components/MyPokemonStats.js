@@ -1,14 +1,15 @@
 import React from "react";
 
-const MyPokemons = ({ name, photo, onUse }) => {
+const MyPokemonStats = ({ name, photo, hp, attack, deffense }) => {
   return (
     <div className="myOwnPokemon">
       <h2>{name.charAt(0).toUpperCase() + name.slice(1)}</h2>
       <img src={photo} alt="" /><br></br>
-      <input name = 'chooseIt' type = 'radio' value = {name} onClick = {onUse}></input>
-      <div></div>
+      <h4>HP: {hp}</h4>
+      <h4>Attack: {attack}</h4>
+      <h4>Deffense: {deffense}</h4>
     </div>
   );
 };
 
-export default MyPokemons;
+export default MyPokemonStats;
