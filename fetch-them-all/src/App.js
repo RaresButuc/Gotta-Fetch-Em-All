@@ -24,8 +24,9 @@ function App() {
     useState(null);
   const [randomPokemonImage, setRandomPokemonImage] = useState(null);
   //My Pokemon Informations: Name and Photo
-  // const [ownedPokemonNames, setOwnedPokemonNames] = useState(null);
   const [ownedPokemonData, setOwnedPokemonData] = useState(null);
+  //Chosen Pokemon
+  const [chosenPokemon, setChosenPokemon] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -47,6 +48,7 @@ function App() {
     setSelectedLocationSecondLink(null);
     setRandomPokemonName(".");
     setRandomPokemonImage(null);
+    setChosenPokemon(null)
   };
 
   //Showing Pokemon Details
@@ -66,7 +68,7 @@ function App() {
         const info = await fetch(selectedLocationFirstLink);
         const firstLink = await info.json();
         let randomArea = Math.floor(Math.random() * firstLink.areas.length);
-        console.log(randomArea);
+        // console.log(randomArea);
         setSelectedLocationSecondLink(firstLink.areas[randomArea].url);
         // console.log(firstLink);
       } catch (error) {
@@ -107,6 +109,7 @@ function App() {
         const imageLink = await info.json();
         setRandomPokemonImage(
           imageLink.sprites.other.dream_world.front_default
+          // imageLink.sprites.front_default
         );
         // console.log(secondLink);
       } catch (error) {
@@ -123,11 +126,10 @@ function App() {
     "https://pokeapi.co/api/v2/pokemon/poliwhirl",
   ];
 
-  const myPokemonInfos = [];
-
   useEffect(() => {
     // const myPokemonInfos = [];
     const getPokeInfo = async () => {
+      const myPokemonInfos = [];
       for (const pokeApi of usersPokemon) {
         const info = await fetch(pokeApi);
         const data = await info.json();
@@ -135,14 +137,14 @@ function App() {
           name: data.forms[0].name,
           photo: data.sprites.front_default,
         });
-        console.log(myPokemonInfos);
+        // console.log(myPokemonInfos);
       }
       setOwnedPokemonData(myPokemonInfos);
       // console.log(myPokemonInfos)
     };
     getPokeInfo();
   }, []);
-  console.log(myPokemonInfos);
+  // console.log(myPokemonInfos);
 
   //Saving My Pokemon Names
   // const myPokemonsNames = () => {
@@ -150,12 +152,23 @@ function App() {
   //   setOwnedPokemonNames(names)
   // }
 
+  //Choosing my Pokemon
+  const choosingMyPokemon = event => {
+    console.log(event.target.value)
+    setChosenPokemon("https://pokeapi.co/api/v2/pokemon/" + event.target.value)
+  };
+  console.log(chosenPokemon)
+
   return (
     <div className="App">
       {onPage ? (
         <div>
           {ownedPokemonData.map((pokemon) => (
-            <MyPokemons name={pokemon.name} photo={pokemon.photo}/>
+            <MyPokemons
+              name={pokemon.name}
+              photo={pokemon.photo}
+              onUse={choosingMyPokemon}
+            />
           ))}
 
           <PokeData

@@ -6,7 +6,7 @@ function Locations({ locationsNames, showInfos }) {
       {locationsNames.map((location) => (
         <div key={location.name}>
           <h2 className="locationNames" onClick={() => showInfos(location)}>
-            {location.name}
+            {location.name.charAt(0).toUpperCase() + location.name.slice(1)}
           </h2>
         </div>
       ))}
