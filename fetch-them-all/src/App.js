@@ -25,11 +25,11 @@ function App() {
   //Encountered Pokemon Image
   const [randomPokemonImage, setRandomPokemonImage] = useState(null);
   //Encountered Pokemon Stats
-  const [hpEncountered, setHpEncountered] = useState(null);
-  const [attackEncountered, setAttackEncountered] = useState(null);
-  const [defenseEncountered, setDefenseEncountered] = useState(null);
+  // const [hpEncountered, setHpEncountered] = useState(null);
+  // const [attackEncountered, setAttackEncountered] = useState(null);
+  // const [defenseEncountered, setDefenseEncountered] = useState(null);
 
-  // const [encounteredPokemonStats, setEncounteredPokemonStats] = useState(null);
+  const [encounteredPokemonStats, setEncounteredPokemonStats] = useState(null);
 
   //My Pokemon Informations: Name and Photo
   const [ownedPokemonData, setOwnedPokemonData] = useState(null);
@@ -114,18 +114,19 @@ function App() {
       try {
         const info = await fetch(mainLink);
         const mainLinkPokemon = await info.json();
-        // const stats = {
-        //   hp: mainLinkPokemon.stats[0].base_stat,
-        //   attack: mainLinkPokemon.stats[1].base_stat,
-        //   defense: mainLinkPokemon.stats[2].base_stat,
-        // };
-        // setEncounteredPokemonStats(stats);
-        setRandomPokemonImage(
-          mainLinkPokemon.sprites.other.dream_world.front_default
-        );
-        setHpEncountered(mainLinkPokemon.stats[0].base_stat);
-        setAttackEncountered(mainLinkPokemon.stats[1].base_stat)
-        setDefenseEncountered(mainLinkPokemon.stats[2].base_stat)
+        const stats = {
+          photo: mainLinkPokemon.sprites.other.dream_world.front_default,
+          hp: mainLinkPokemon.stats[0].base_stat,
+          attack: mainLinkPokemon.stats[1].base_stat,
+          defense: mainLinkPokemon.stats[2].base_stat,
+        };
+        setEncounteredPokemonStats(stats);
+        // setRandomPokemonImage(
+        //   mainLinkPokemon.sprites.other.dream_world.front_default
+        // );
+        // setHpEncountered(mainLinkPokemon.stats[0].base_stat);
+        // setAttackEncountered(mainLinkPokemon.stats[1].base_stat)
+        // setDefenseEncountered(mainLinkPokemon.stats[2].base_stat)
         
       } catch (error) {
         console.error(error);
@@ -186,7 +187,7 @@ function App() {
   //   fetchData();
   // }, []);
   // console.log(statsChosenPokemon)
-
+  console.log(encounteredPokemonStats)
   return (
     <div className="App">
       {onPage ? (
@@ -199,18 +200,18 @@ function App() {
             />
           ))}
 
-          <PokeData
+          {encounteredPokemonStats && <PokeData
             name={
               randomPokemonName
                 ? randomPokemonName
                 : "This location doesn't seem to have any pokémon"
             }
-            photo={randomPokemonImage}
-            hp={hpEncountered}
-            attack={attackEncountered}
-            deffense={defenseEncountered}
+            photo={encounteredPokemonStats.photo}
+            hp= {encounteredPokemonStats.hp}
+            attack = {encounteredPokemonStats.attack}
+            defense = {encounteredPokemonStats.defense}
             onBack={handleBack}
-          />
+          />}
         </div>
       ) : (
         <Locations
