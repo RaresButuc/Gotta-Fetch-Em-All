@@ -1,11 +1,11 @@
 import React from "react";
 
-const MyPokemons = ({ name, photo }) => {
+const MyPokemons = ({ name, photo, onUse }) => {
   return (
-    <div>
-      <h2>{name}</h2>
+    <div className="myOwnPokemon">
+      <h2>{name.charAt(0).toUpperCase() + name.slice(1)}</h2>
       <img src={photo} alt="" /><br></br>
-      <input type = 'radio'></input>
+      <input name = 'chooseIt' type = 'radio' value = {name} onClick = {onUse}></input>
     </div>
   );
 };
