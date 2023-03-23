@@ -4,6 +4,13 @@ import Locations from "./components/Locations";
 import PokeData from "./components/PokeData";
 import MyPokemons from "./components/MyPokemons";
 import MyPokemonStats from "./components/MyPokemonStats";
+import BackToLocations from "./components/BackToLocations";
+
+const usersPokemon = [
+  "https://pokeapi.co/api/v2/pokemon/bulbasaur",
+  "https://pokeapi.co/api/v2/pokemon/charizard",
+  "https://pokeapi.co/api/v2/pokemon/poliwhirl",
+];
 
 function App() {
   //Show Locations
@@ -123,15 +130,8 @@ function App() {
     fetchData();
   }, [mainLink]);
 
-  //My own Pokemons
-  const usersPokemon = [
-    "https://pokeapi.co/api/v2/pokemon/bulbasaur",
-    "https://pokeapi.co/api/v2/pokemon/charizard",
-    "https://pokeapi.co/api/v2/pokemon/poliwhirl",
-  ];
-
   //Getting the names and photos of my pokemons
-  useEffect(() => {
+  // useEffect(() => {
     const getPokeInfo = async () => {
       const myPokemonInfos = [];
       for (const pokeApi of usersPokemon) {
@@ -149,7 +149,7 @@ function App() {
       setOwnedPokemonData(myPokemonInfos);
     };
     getPokeInfo();
-  }, []);
+  // }, []);
 
   //Choosing my Pokemon
   const choosingMyPokemon = (event) => {
@@ -174,7 +174,7 @@ function App() {
   };
 
   const properFight = () => {
-    setFinished(true)
+    setFinished(true);
     let attackerHp = statsChosenPokemon.hp;
     let defenderHp = encounteredPokemonStats.hp;
 
@@ -190,20 +190,22 @@ function App() {
     } while (attackerHp > 0 && defenderHp > 0);
     if (attackerHp <= 0) {
       console.log("Defender Won!");
-      setRandomPokemonName('You Lost!')
-      setEncounteredPokemonStats(null)
-      setStatsChosenPokemon(null)
+      let encounteredPokemon =
+        randomPokemonName.charAt(0).toUpperCase() + randomPokemonName.slice(1);
+      setRandomPokemonName(`You Lost! ${encounteredPokemon} beat you!`);
+      setStatsChosenPokemon(null);
     } else if (defenderHp <= 0) {
       console.log("Attacker Won!");
       usersPokemon.push(
         "https://pokeapi.co/api/v2/pokemon/" + randomPokemonName
       );
+      console.log(usersPokemon);
       let wonPokemon = randomPokemonName;
       setRandomPokemonName(
         `Congratulations! You won a new Pokemon in your collection: 
         ${wonPokemon.charAt(0).toUpperCase() + wonPokemon.slice(1)}!`
       );
-      setStatsChosenPokemon(null)
+      setStatsChosenPokemon(null);
     }
   };
 
@@ -220,18 +222,20 @@ function App() {
           ))}
 
           {encounteredPokemonStats && (
-            <PokeData
-              name={
-                randomPokemonName.length > 1
-                  ? randomPokemonName
-                  : "This location doesn't seem to have any pokémon"
-              }
-              photo={encounteredPokemonStats.photo}
-              hp={encounteredPokemonStats.hp}
-              attack={encounteredPokemonStats.attack}
-              defense={encounteredPokemonStats.defense}
-              // onBack={handleBack}
-            />
+            <>
+              <PokeData
+                name={
+                  randomPokemonName.length > 1
+                    ? randomPokemonName
+                    : "This location doesn't seem to have any pokémon"
+                }
+                photo={encounteredPokemonStats.photo}
+                hp={encounteredPokemonStats.hp}
+                attack={encounteredPokemonStats.attack}
+                defense={encounteredPokemonStats.defense}
+              />
+              <BackToLocations getBack={handleBack} />
+            </>
           )}
 
           {statsChosenPokemon && (
