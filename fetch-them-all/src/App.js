@@ -8,35 +8,35 @@ import MyPokemonStats from "./components/MyPokemonStats";
 function App() {
   //Show Locations
   let [locations, setLocations] = useState([]);
+
   //On page or Not
   const [onPage, setOnPage] = useState(false);
-  //Selected Location
-  const [selectedLocation, setSelectedLocation] = useState(null);
+
   //Selected Location FLink
   const [selectedLocationFirstLink, setSelectedLocationFirstLink] =
     useState(null);
+
   //Selected Location SLink
   const [selectedLocationSecondLink, setSelectedLocationSecondLink] =
     useState(null);
+
   //Encountered Pokemon Name
   const [randomPokemonName, setRandomPokemonName] = useState(".");
+
   //Accesing Main Link
   const [mainLink, setMainLink] = useState(null);
-  //Encountered Pokemon Image
-  const [randomPokemonImage, setRandomPokemonImage] = useState(null);
-  //Encountered Pokemon Stats
-  // const [hpEncountered, setHpEncountered] = useState(null);
-  // const [attackEncountered, setAttackEncountered] = useState(null);
-  // const [defenseEncountered, setDefenseEncountered] = useState(null);
 
+  //Encountered Pokemon Stats
   const [encounteredPokemonStats, setEncounteredPokemonStats] = useState(null);
 
   //My Pokemon Informations: Name and Photo
   const [ownedPokemonData, setOwnedPokemonData] = useState(null);
+
   //Chosen Pokemon
-  const [chosenPokemon, setChosenPokemon] = useState(null);
-  // const [chosenOrNot, setChosenOrNot] = useState(null);
   const [statsChosenPokemon, setStatsChosenPokemon] = useState(null);
+
+  //Finished Game
+  const [finished, setFinished] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -53,12 +53,9 @@ function App() {
 
   const handleBack = () => {
     setOnPage(false);
-    setSelectedLocation(null);
     setSelectedLocationFirstLink(null);
     setSelectedLocationSecondLink(null);
     setRandomPokemonName(".");
-    setRandomPokemonImage(null);
-    setChosenPokemon(null);
     setStatsChosenPokemon(null);
   };
 
@@ -66,7 +63,6 @@ function App() {
 
   function handleLocationDetails(location) {
     setOnPage(true);
-    setSelectedLocation(location);
     //First URL
     const linkLocation = location.url;
     setSelectedLocationFirstLink(linkLocation);
@@ -157,9 +153,58 @@ function App() {
 
   //Choosing my Pokemon
   const choosingMyPokemon = (event) => {
-    setStatsChosenPokemon(
-      ownedPokemonData.filter((pokemon) => pokemon.name === event.target.value)
+    const chosen = ownedPokemonData.filter(
+      (pokemon) => pokemon.name === event.target.value
     );
+    setStatsChosenPokemon(chosen[0]);
+  };
+
+  //Fighting
+  const damage = (attacker, defender) => {
+    //Attacker
+    const B = attacker.attack;
+    //Defender
+    const D = defender.defense;
+    //Random Number and Damage
+    const Z = Math.floor(Math.random() * (255 - 217 + 1)) + 217;
+    const damage = ((((2 / 5 + 2) * B * 60) / D / 50 + 2) * Z) / 255;
+
+    console.log(damage);
+    return Math.floor(damage);
+  };
+
+  const properFight = () => {
+    setFinished(true)
+    let attackerHp = statsChosenPokemon.hp;
+    let defenderHp = encounteredPokemonStats.hp;
+
+    do {
+      console.log(
+        (defenderHp =
+          defenderHp - damage(statsChosenPokemon, encounteredPokemonStats))
+      );
+      console.log(
+        (attackerHp =
+          attackerHp - damage(encounteredPokemonStats, statsChosenPokemon))
+      );
+    } while (attackerHp > 0 && defenderHp > 0);
+    if (attackerHp <= 0) {
+      console.log("Defender Won!");
+      setRandomPokemonName('You Lost!')
+      setEncounteredPokemonStats(null)
+      setStatsChosenPokemon(null)
+    } else if (defenderHp <= 0) {
+      console.log("Attacker Won!");
+      usersPokemon.push(
+        "https://pokeapi.co/api/v2/pokemon/" + randomPokemonName
+      );
+      let wonPokemon = randomPokemonName;
+      setRandomPokemonName(
+        `Congratulations! You won a new Pokemon in your collection: 
+        ${wonPokemon.charAt(0).toUpperCase() + wonPokemon.slice(1)}!`
+      );
+      setStatsChosenPokemon(null)
+    }
   };
 
   return (
@@ -177,7 +222,7 @@ function App() {
           {encounteredPokemonStats && (
             <PokeData
               name={
-                randomPokemonName
+                randomPokemonName.length > 1
                   ? randomPokemonName
                   : "This location doesn't seem to have any pokémon"
               }
@@ -192,13 +237,14 @@ function App() {
           {statsChosenPokemon && (
             <MyPokemonStats
               name={
-                statsChosenPokemon[0].name.charAt(0).toUpperCase() +
-                statsChosenPokemon[0].name.slice(1)
+                statsChosenPokemon.name.charAt(0).toUpperCase() +
+                statsChosenPokemon.name.slice(1)
               }
-              photo={statsChosenPokemon[0].photoBig}
-              hp={statsChosenPokemon[0].hp}
-              attack={statsChosenPokemon[0].attack}
-              defense={statsChosenPokemon[0].defense}
+              photo={statsChosenPokemon.photoBig}
+              hp={statsChosenPokemon.hp}
+              attack={statsChosenPokemon.attack}
+              defense={statsChosenPokemon.defense}
+              fightAction={properFight}
             />
           )}
         </div>
