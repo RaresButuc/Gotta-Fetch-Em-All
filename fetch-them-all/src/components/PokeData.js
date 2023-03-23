@@ -8,7 +8,6 @@ const PokeData = ({ name, photo, hp, attack, defense, onBack }) => {
       <h4>HP: {hp}</h4>
       <h4>Attack: {attack}</h4>
       <h4>Defense: {defense}</h4><br></br>
-      {/* <button onClick={onBack} className = 'backButton'>Back</button> */}
     </div>
   );
 };
